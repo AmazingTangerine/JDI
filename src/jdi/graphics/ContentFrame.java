@@ -1,5 +1,6 @@
 package jdi.graphics;
 
+import caprica.datatypes.SystemFile;
 import caprica.datatypes.Vector;
 import java.awt.BorderLayout;
 import java.awt.Font;
@@ -9,22 +10,23 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.JTextPane;
 
 
 public class ContentFrame extends JFrame {
     
-    public static final double SCREEN_SCALE = 1;
-    
     private MenuBar menuBar;
     
-    private JTextArea inputTextArea;
+    private JTextPane inputTextArea;
     private JTextArea outputTextArea;
     
-    public ContentFrame(){
+    private SystemFile lastOpen = null;
+    
+    public ContentFrame( Vector screenSize ){
         
         super( "Java Dragon Interface" );
         
-        this.setPreferredSize( new Vector( 1600 , 900 ).scale( SCREEN_SCALE , SCREEN_SCALE ).asDimension() );
+        this.setPreferredSize( screenSize.asDimension() );
         this.setDefaultCloseOperation( JFrame.DISPOSE_ON_CLOSE );
         
         
@@ -34,14 +36,13 @@ public class ContentFrame extends JFrame {
         
         JTabbedPane tabbedPane = new JTabbedPane();
 
-        inputTextArea = new JTextArea( 40 , 100 ); //this dimension doesn't matter
+        inputTextArea = new JTextPane(); //these dimensions doesn't matter
         outputTextArea = new JTextArea( 40 , 100 ); 
      
-        inputTextArea.setLineWrap( true );
         inputTextArea.setFont( new Font( "Consolas" , Font.PLAIN , 11 ) );
         outputTextArea.setFont( new Font( "Consolas" , Font.PLAIN , 11 ) );
         outputTextArea.setLineWrap( true );
-        inputTextArea.setWrapStyleWord( true );
+
         outputTextArea.setWrapStyleWord( true );
         
         tabbedPane.addTab( "Input" ,  new JScrollPane( inputTextArea ) );
@@ -54,7 +55,19 @@ public class ContentFrame extends JFrame {
         
     }
 
-    public JTextArea getInputArea(){
+    public void setLastOpenedFile( SystemFile openedFile ){
+        
+        this.lastOpen = openedFile;
+        
+    }
+    
+    public SystemFile getLastOpenedFile(){
+        
+        return this.lastOpen;
+        
+    }
+    
+    public JTextPane getInputArea(){
     
         return inputTextArea;
         

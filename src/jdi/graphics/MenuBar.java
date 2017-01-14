@@ -10,6 +10,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JMenu;
@@ -24,23 +25,55 @@ public class MenuBar extends JMenuBar {
     public MenuBar( ContentFrame contentFrame ){
         
         this.contentFrame = contentFrame;
-        
-        FileActionListener fileActionListener = new FileActionListener();
-        
-        JMenu fileMenu = new JMenu( "File" );
+  
+        HashMap< String , Object[] > menuItems = new HashMap<>();
 
-        String[] fileTexts = new String[]{ "Open input" , "Save input" , "Open output" , "Save output" , "Run" };
+        String[] fileTexts = new String[]{ "Open input" , "Save input" , "Save input as" , "Open output" , "Save output" };
+        String[] runTexts = new String[]{ "Run" };
+
+        menuItems.put( "Files" , new Object[]{ fileTexts , new FileActionListener() } );
+        menuItems.put( "Run" , new Object[]{ runTexts , new RunActionListener() } );
+ 
+        String[] keyOrder = new String[]{ "Files" , "Run" };
         
-        for ( String fileText : fileTexts ){
+        for ( String key : keyOrder ){
             
-            JMenuItem fileMenuItem = new JMenuItem( fileText );
-            fileMenuItem.addActionListener( fileActionListener );
-            fileMenu.add( fileMenuItem );
+            Object[] dataPair = menuItems.get( key );
+            
+            String[] menuNames = ( String[] ) dataPair[ 0 ];
+            ActionListener listener = ( ActionListener ) dataPair[ 1 ];
+            
+            JMenu menu = new JMenu( key );
+            
+            for ( String name : menuNames ){
+                
+                JMenuItem menuItem = new JMenuItem( name );
+                menuItem.addActionListener( listener );
+                
+                menu.add( menuItem );
+                
+            }
+
+            this.add( menu );
             
         }
         
-        this.add( fileMenu );
-
+    }
+    
+    private class RunActionListener implements ActionListener {
+        
+        @Override
+        public void actionPerformed( ActionEvent event ) {
+          
+            String buttonText = event.getActionCommand();
+            
+            if ( buttonText.equals( "Run" ) ){
+                
+                FileHandling.runFile( contentFrame );
+                
+            }
+        
+        }
         
     }
     
@@ -53,189 +86,27 @@ public class MenuBar extends JMenuBar {
             
             if ( buttonText.equals( "Open input" ) ){
                 
-                openInputFile();
+                FileHandling.openInputFile( contentFrame );
+                
+            }
+            else if ( buttonText.equals( "Save input" ) ){
+                
+                FileHandling.saveInputFile( contentFrame );
+                
+            }
+            else if ( buttonText.equals( "Save input as" ) ){
+                
+                FileHandling.saveInputFileAs( contentFrame );
                 
             }
             else if ( buttonText.equals( "Save output" ) ){
                 
-                saveOutputFile();
-                
-            }
-            else if ( buttonText.equals( "Run" ) ){
-                
-                runFile();
+                FileHandling.saveOutputFile( contentFrame );
                 
             }
             
         }
-        
-        
-    }
-    
-    private void saveOutputFile(){
-        
-        SystemFile selectedFile = getFileDialog( this );
-        
-        if ( selectedFile != null ){
-            
-            if ( selectedFile.exists() ){
-                
-                selectedFile.delete();
-                
-            }
-            
-            selectedFile.create();
-            
-            try {
-                
-                selectedFile.write( contentFrame.getOutputArea().getText() , false );
-                
-            }
-            catch( Exception exception ){}
-            
-        }
-        
-    }
-    
-    private void openInputFile(){
-        
-        SystemFile selectedFile = getFileDialog( this );
-        
-        if ( selectedFile != null ){
-            
-            contentFrame.getInputArea().setText( selectedFile.toString() );
-            
-        }
-        
-    }
-    
-
-        
-    
-    
-    private void runFile(){
-        
-        new Subroutine( new DragonExecute() ).runOnce();
-        
-    }
-    
-    private SystemFile getFileDialog( JComponent parent ){
-        
-        JFileChooser fileChooser = new JFileChooser();
-        fileChooser.setCurrentDirectory( new File( System.getProperty( "user.dir" ) + "/dragon/" ) );
-        
-        int result = fileChooser.showOpenDialog( parent );
-        
-        if ( result == JFileChooser.APPROVE_OPTION ){
-
-            return new SystemFile( fileChooser.getSelectedFile() );
-            
-        }
-        else {
-            
-            return null;
-            
-        }
 
     }
-    
-    private SystemFile getSaveFileDialog( JComponent parent ){
-        
-        JFileChooser fileChooser = new JFileChooser();
-        fileChooser.setCurrentDirectory( new File( System.getProperty( "user.dir" ) + "/dragon/" ) );
-        
-        int result = fileChooser.showSaveDialog( parent );
-        
-        if ( result == JFileChooser.APPROVE_OPTION ){
-
-            return new SystemFile( fileChooser.getSelectedFile() );
-            
-        }
-        else {
-            
-            return null;
-            
-        }
-
-    }
-    
-    private class DragonExecute implements ThreadRoutine {
-
-        @Override
-        public void run() {
-
-            String inputData = contentFrame.getInputArea().getText();
-        
-            if ( inputData != null ){
-            
-                SystemFile tempInputFile = new SystemFile( System.getProperty( "user.dir" ) + "/dragon/temp.inp" );
-                SystemFile tempOutputFile = new SystemFile( System.getProperty( "user.dir" ) + "/dragon/temp.txt" );
-                
-                if ( tempOutputFile.exists() ){
-                    
-                    tempOutputFile.delete();
-                    
-                }
-                
-                if ( tempInputFile.exists() ){
-                    
-                    tempInputFile.delete();
-                    
-                }
-                
-                try {
-                
-                    tempInputFile.write( inputData , false );
-             
-                    try {
-                        
-                        SystemFile tempBatFile = new SystemFile( System.getProperty( "user.dir" ).replace( "\\" , "/" ) + "/dragon/temp.bat" );
-                        tempBatFile.write( "@echo off \n dragon\\dragonr.exe <dragon\\temp.inp> dragon\\temp.txt" , false );
-                        
-                        String dragonCommand = "cmd /C start " + tempBatFile.getFilePath();
-           
-                        Control.exec( dragonCommand , true );
-                        Control.exec( "taskkill /f /im cmd.exe" , true );
-                  
-                        tempInputFile.delete();
-                        tempBatFile.delete();
-                    
-                    
-                        if ( tempOutputFile.exists() ){
-                    
-                            String outputContent = tempOutputFile.toString();
-                            
-                            contentFrame.getOutputArea().setText( outputContent );
-                            
-                            Control.sleep( 1 );
-                            
-                            boolean deleted = tempOutputFile.delete();
-                    
-                        }
-                        else {
-                    
-                            //Throw error
-                    
-                        }
-                        
-                    }
-                    catch( Exception ePrime ){
-                        
-                        
-                    }
-
-                
-                }
-                catch( Exception exception ){
-                
-                    //Catch this later
-                
-                }
-            
-            }
-            
-        }
-         
-    }
-    
+   
 }
