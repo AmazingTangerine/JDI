@@ -4,16 +4,20 @@ import caprica.drawingtypes.Color;
 import caprica.system.Output;
 import caprica.system.Subroutine;
 import caprica.system.ThreadRoutine;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JTextArea;
 import javax.swing.JTextPane;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
 import javax.swing.text.Caret;
 import javax.swing.text.Document;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyleContext;
+import jdi.graphics.Popup;
 
 public class CodeCoordinator {
     
@@ -28,7 +32,7 @@ public class CodeCoordinator {
     
     private boolean updating = false;
     private boolean autoUpdate = false;
-    
+
     public CodeCoordinator( JTextPane textArea ){
         
         this.textArea = textArea;
@@ -44,6 +48,24 @@ public class CodeCoordinator {
         textUpdater = new TextAreaUpdater();
         
         textArea.getDocument().addDocumentListener( textUpdater );
+        
+    }
+    
+    public String getActualText(){
+        
+        String data;
+        try {
+            
+            data = textArea.getDocument().getText( 0 , textArea.getDocument().getLength() );
+            
+        } 
+        catch ( BadLocationException exception ) {
+       
+            data = null;
+            
+        }
+
+        return data;
         
     }
     
@@ -118,7 +140,7 @@ public class CodeCoordinator {
         StyleContext styleContext = StyleContext.getDefaultStyleContext();
         AttributeSet asset = styleContext.addAttribute( SimpleAttributeSet.EMPTY , StyleConstants.Foreground , color.asColor() );
 
-        asset = styleContext.addAttribute( asset , StyleConstants.FontFamily , "Lucida Console" );
+        asset = styleContext.addAttribute( asset , StyleConstants.FontFamily , "Consolas" );
         asset = styleContext.addAttribute( asset , StyleConstants.Alignment , StyleConstants.ALIGN_JUSTIFIED );
 
         int length = textArea.getCaretPosition();

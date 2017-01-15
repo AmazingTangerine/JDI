@@ -127,6 +127,8 @@ public class FileHandling {
             
             String data = selectedFile.toString();
 
+            //contentFrame.getInputArea().setText( data );
+            
             contentFrame.getEncoder().processCode( data );
             
         }
@@ -192,8 +194,8 @@ public class FileHandling {
         @Override
         public void run() {
 
-            String inputData = contentFrame.getInputArea().getText();
-        
+            String inputData = contentFrame.getEncoder().getActualText();
+      
             if ( inputData != null ){
             
                 SystemFile tempInputFile = new SystemFile( System.getProperty( "user.dir" ) + "/dragon/temp.inp" );
@@ -219,7 +221,7 @@ public class FileHandling {
                     
                     try {
      
-                        tempBatFile.write( "@echo off \n dragon\\dragonr.exe <dragon\\temp.inp> dragon\\temp.txt" , false );
+                        tempBatFile.write( "@echo off \n dragon\\dragon304s.exe <dragon\\temp.inp> dragon\\temp.txt" , false );
                         
                         String dragonCommand = "cmd /C start " + tempBatFile.getFilePath();
            
