@@ -2,6 +2,7 @@ package jdi.graphics;
 
 import caprica.datatypes.SystemFile;
 import caprica.datatypes.Vector;
+import caprica.system.Output;
 import java.awt.BorderLayout;
 import java.awt.Font;
 import javax.swing.JFrame;
@@ -11,6 +12,9 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import jdi.dragon.CodeCoordinator;
 
 
 public class ContentFrame extends JFrame {
@@ -21,6 +25,9 @@ public class ContentFrame extends JFrame {
     private JTextArea outputTextArea;
     
     private SystemFile lastOpen = null;
+    
+    private boolean autoUpdate = false;
+    private CodeCoordinator encoder = null;
     
     public ContentFrame( Vector screenSize ){
         
@@ -38,7 +45,7 @@ public class ContentFrame extends JFrame {
 
         inputTextArea = new JTextPane(); //these dimensions doesn't matter
         outputTextArea = new JTextArea( 40 , 100 ); 
-     
+
         inputTextArea.setFont( new Font( "Consolas" , Font.PLAIN , 11 ) );
         outputTextArea.setFont( new Font( "Consolas" , Font.PLAIN , 11 ) );
         outputTextArea.setLineWrap( true );
@@ -52,6 +59,42 @@ public class ContentFrame extends JFrame {
         
         this.pack();
         this.setVisible( true );
+        
+        encoder = new CodeCoordinator( inputTextArea );
+        
+    }
+    
+    public void setEncoder( CodeCoordinator encoder ){
+        
+        this.encoder = encoder;
+        
+    }
+    
+    public CodeCoordinator getEncoder(){
+        
+        return encoder;
+        
+    }
+    
+    public void refreshInput(){
+        
+        if ( encoder != null ){
+            
+            encoder.refresh();
+            
+        }
+        
+    }
+    
+    public void setAutoUpdate( boolean autoUpdate ){
+        
+        this.autoUpdate = autoUpdate;
+        
+        if ( encoder != null ){
+            
+            encoder.setAutoUpdate( autoUpdate );
+            
+        }
         
     }
 

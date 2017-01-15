@@ -11,6 +11,8 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import javax.swing.AbstractButton;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JMenu;
@@ -28,13 +30,16 @@ public class MenuBar extends JMenuBar {
   
         HashMap< String , Object[] > menuItems = new HashMap<>();
 
-        String[] fileTexts = new String[]{ "Open input" , "Save input" , "Save input as" , "Open output" , "Save output" };
+        String[] fileTexts = new String[]{ "Open input" , "Save input" , "Save input as" , "." , "Open output" , "Save output" };
         String[] runTexts = new String[]{ "Run" };
+        String[] updateTexts = new String[]{ "Update" , "Auto Update|" };
 
         menuItems.put( "Files" , new Object[]{ fileTexts , new FileActionListener() } );
         menuItems.put( "Run" , new Object[]{ runTexts , new RunActionListener() } );
+        menuItems.put( "Update" , new Object[]{ updateTexts , new UpdateActionListener() } );
+        
  
-        String[] keyOrder = new String[]{ "Files" , "Run" };
+        String[] keyOrder = new String[]{ "Files" , "Run" , "Update" };
         
         for ( String key : keyOrder ){
             
@@ -47,15 +52,59 @@ public class MenuBar extends JMenuBar {
             
             for ( String name : menuNames ){
                 
-                JMenuItem menuItem = new JMenuItem( name );
-                menuItem.addActionListener( listener );
+                if ( name.contains( "|" ) ){
+                    
+                    name = name.replace( "|" , "" );
+                    
+                    JMenuItem menuItem = new JCheckBoxMenuItem( name );
+                    menuItem.addActionListener( listener );
                 
-                menu.add( menuItem );
+                    menu.add( menuItem );
+                    
+                }
+                else if ( name.equals( "." ) ){
+                    
+                    menu.addSeparator();
+                    
+                }
+                else {
+                
+                    JMenuItem menuItem = new JMenuItem( name );
+                    menuItem.addActionListener( listener );
+                
+                    menu.add( menuItem );
+                
+                }
                 
             }
 
             this.add( menu );
             
+        }
+        
+    }
+    
+    private class UpdateActionListener implements ActionListener {
+        
+        @Override
+        public void actionPerformed( ActionEvent event ) {
+          
+            String buttonText = event.getActionCommand();
+            
+            if ( buttonText.equals( "Update" ) ){
+                
+                contentFrame.refreshInput();
+                
+            }
+            else if ( buttonText.equals( "Auto Update" ) ){
+                
+                AbstractButton button = ( AbstractButton ) event.getSource();
+                boolean selected = button.getModel().isSelected();
+                
+                contentFrame.setAutoUpdate( selected );
+                
+            }
+        
         }
         
     }

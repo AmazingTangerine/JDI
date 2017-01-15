@@ -1,0 +1,173 @@
+ DDDDDD   RRRRRR     AAA     GGGGG    OOOOO   NN     NN
+ DDDDDDD  RRRRRRR   AAAAA   GGGGGGG  OOOOOOO  NNN    NN
+ DD   DD  RR   RR  AA   AA  GG       OO   OO  NNNN   NN
+ DD   DD  RRRRRR   AA   AA  GG  GGG  OO   OO  NN NN  NN
+ DD   DD  RRRR     AAAAAAA  GG  GGG  OO   OO  NN  NN NN
+ DD   DD  RR RR    AAAAAAA  GG   GG  OO   OO  NN   NNNN
+ DDDDDDD  RR  RR   AA   AA  GGGGGGG  OOOOOOO  NN    NNN
+ DDDDDD   RR   RR  AA   AA   GGGGG    OOOOO   NN     NN
+
+ VERSION DRAGON 3.04 (2000/03/31)
+ GROUPE D'ANALYSE NUCLEAIRE
+ ECOLE POLYTECHNIQUE DE MONTREAL
+
+
+
+ You are now using DRAGON  3.04 Revision Sc (2005/05/26)
+
+
+ COPYRIGHT NOTICE FOR THIS VERSION OF DRAGON:
+ --------------------------------------------
+ PERMISSION IS GRANTED TO THE PUBLIC TO COPY
+ DRAGON WITHOUT CHARGE PROVIDED THAT THIS
+ NOTICE IS REPRODUCED ON ALL COPIES.
+ ECOLE POLYTECHNIQUE DE MONTREAL MAKES NO
+ WARRANTY, EXPRESS OR IMPLIED, AND ASSUMES
+ NO LIABILITY OR RESPONSIBILITY FOR THE USE
+ OF DRAGON.
+
+
+
+* CLE-2000 VERS 2.1 * R.ROY, EPM COPYRIGHT 1999 *                           LINE
+*----                                                                       0001
+* TEST CASE TCM01                                                           0002
+* MACROSCOPIC CROSS SECTIONS                                                0003
+* FISSION SOURCE PROBLEM                                                    0004
+* 1-D ANNULAR CELL                                                          0005
+*                                                                          0006
+* REF: none                                                                 0007
+*                                                                           0008
+*----                                                                       0009
+* Define STRUCTURES and MODULES used                                        0010
+*----                                                                       0011
+LINKED_LIST                                                                 0012
+MACRO ANGEO TRACK SYS FLUX EDITION ;                                        0013
+SEQ_BINARY TRKBIN ;                                                         0014
+SEQ_ASCII                                                                   0015
+res  picture.ps ;                                                           0016
+MODULE                                                                      0017
+GEO: EXCELT: MAC: ASM: FLU: EDI: DELETE: END: PSP: ;                        0018
+                                                                            0019
+*----                                                                       0020
+* Macroscopic XS                                                            0021
+*----                                                                       0022
+MACRO := MAC: ::                                                            0023
+NGRO 2 NMIX 2 NIFI 1                                                        0024
+READ INPUT                                                                  0025
+MIX 1 TOTAL 0.222222 0.833333                                               0026
+SCAT 1 1 0.19222 2 2 0.75333 0.02                                           0027
+NUSIGF 0.0 0.135 CHI 1.0 0.0                                                0028
+MIX 2 TOTAL 0.166667 1.111111                                               0029
+SCAT 2 2 0.00015 0.126667 2 2 1.10111 0.04                                  0030
+;                                                                           0031
+*----                                                                       0032
+* Geometry : ANGEO - Annular 2 regions                                      0033
+*----                                                                       0034
+ANGEO := GEO: :: CARCEL 2 1 1                                               0035
+MESHX 0.0 3.0                                                               0036
+MESHY 0.0 3.0                                                               0037
+X- REFL                                                                     0038
+X+ REFL                                                                     0039
+Y- REFL                                                                     0040
+Y+ REFL                                                                     0041
+RADIUS 0.0 0.19653 1.0                                                      0042
+MIX 1 2 2                                                                   0043
+SPLITR 1 4                                                                  0044
+ ;                                                                          0045
+                                                                            0046
+picture.ps := PSP: ANGEO ::  TYPE MIXTURE ;                                 0047
+                                                                            0048
+                                                                            0049
+*----                                                                       0050
+* Tracking : EXCELT                                                         0051
+* Solution : PIJ                                                            0052
+* 1- KEFF WITHOUT BUCKLING                                                  0053
+*----                                                                       0054
+ TRACK TRKBIN := EXCELT: ANGEO ::                                           0055
+EDIT 4                                                                      0056
+MAXR 8 TRAK TISO 10 20.0                                                    0057
+ ;                                                                          0058
+ECHO ' passed excelt' ;                                                     0059
+     ?              ?                                                   
+! WARNING: INSIDE CLE-2000, ENCLOSE STRINGS IN "..." (REPLACED)         
+                                                                            0060
+SYS := ASM: MACRO TRACK TRKBIN ::                                           0061
+EDIT 4 ;                                                                    0062
+FLUX := FLU: SYS MACRO TRACK ::                                             0063
+TYPE K ;                                                                    0064
+EDITION := EDI: FLUX MACRO TRACK ::                                         0065
+EDIT 3 SAVE ;                                                               0066
+res := EDITION ;                                                            0067
+END: ;                                                                      0068
+QUIT "LIST" .                                                               0069
+ 
+<|LINKED_LIST                                                             |<0012
+<|MACRO ANGEO TRACK SYS FLUX EDITION ;                                    |<0013
+<|SEQ_BINARY TRKBIN ;                                                     |<0014
+<|SEQ_ASCII                                                               |<0015
+<|res  picture.ps ;                                                       |<0016
+<|MODULE                                                                  |<0017
+<|GEO: EXCELT: MAC: ASM: FLU: EDI: DELETE: END: PSP: ;                    |<0018
+<|MACRO := MAC: ::                                                        |<0023
+->@BEGIN MODULE : MAC:        
+->@DESCRIPTION  : MACROSCOPIC X-S PROCESSOR                                               
+->@CREDITS      : G. MARLEAU                                                              
+->@COPYRIGHTS   : ECOLE POLYTECHNIQUE DE MONTREAL 
+<|NGRO 2 NMIX 2 NIFI 1                                                    |<0024
+<|READ INPUT                                                              |<0025
+<|MIX 1 TOTAL 0.222222 0.833333                                           |<0026
+<|SCAT 1 1 0.19222 2 2 0.75333 0.02                                       |<0027
+<|NUSIGF 0.0 0.135 CHI 1.0 0.0                                            |<0028
+<|MIX 2 TOTAL 0.166667 1.111111                                           |<0029
+<|SCAT 2 2 0.00015 0.126667 2 2 1.10111 0.04                              |<0030
+<|;                                                                       |<0031
+ CROSS SECTION TYPE     TOTAL      NUSIGF     FIXE       CHI        SCAT   1   TRANC     FIXA       FIXG  
+ MATERIAL     1         READ       READ                  READ       READ                                   
+ MATERIAL     2         READ                                        READ                                   
+ MACROLIB STATE-VECTOR ( 9) ELEMENTS FROM: MAC   
+ --------------------------------
+ NGROUP =       2 (NUMBER OF GROUPS)
+ NBMIX  =       2 (NUMBER OF MIXTURE)
+ NANISO =       1 (MAXIMUM SCATTERING ANISOTROPY)
+ NIFISS =       1 (NUMBER OF FISSILE ISOTOPES)
+ NEDMAC =       0 (NUMBER OF CROSS SECTION EDIT)
+ ITRANC =       0 (TYPE OF TRANSPORT CORRECTION;
+                   = 0: NO CORRECTION;
+                   = 1: FROM PN SCATTERING MATRIX;
+                   = 2: RECOVERED FROM MACROLIB)
+ NLG    =       0 (NUMBER OF DELAYED PRECURSOR GROUPS)
+ NALBD  =       0 (NUMBER OF PHYSICAL ALBEDOS)
+ ILEAK  =       0 (LEAKAGE TYPE)
+ --------------------------------
+
+->@END MODULE   : MAC:        
+<|ANGEO := GEO: :: CARCEL 2 1 1                                           |<0035
+->@BEGIN MODULE : GEO:        
+->@DESCRIPTION  : GEOMETRY DEFINITION                                                     
+->@CREDITS      : A. HEBERT                                                               
+->@COPYRIGHTS   : ECOLE POLYTECHNIQUE DE MONTREAL 
+<|MESHX 0.0 3.0                                                           |<0036
+<|MESHY 0.0 3.0                                                           |<0037
+<|X- REFL                                                                 |<0038
+<|X+ REFL                                                                 |<0039
+<|Y- REFL                                                                 |<0040
+<|Y+ REFL                                                                 |<0041
+<|RADIUS 0.0 0.19653 1.0                                                  |<0042
+<|MIX 1 2 2                                                               |<0043
+<|SPLITR 1 4                                                              |<0044
+<| ;                                                                      |<0045
+
+ CREATION OF A LEVEL   1 GEOMETRY
+ GEOMETRY NAME    =     /           
+ LINKED LIST NAME =     ANGEO       
+ GEOMETRY TYPE    =     2-D RECT. CELL  
+->@END MODULE   : GEO:        
+<|picture.ps := PSP: ANGEO ::  TYPE MIXTURE ;                             |<0047
+  KERNEL: PROBLEM WHEN OPENING FILE *picture.ps                                 
+                              *
+KERNEL: KDROPN FAILURE. IRC= -8                                         
+->@ERROR FROM KERNEL IN DRAGON CODE =          0
+ DRAGON: KERNEL ERROR
+ DESTROY DA FILE = _FIL001       UNIT =         99
+
+ ABORT REQUESTED.

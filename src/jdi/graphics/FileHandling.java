@@ -126,9 +126,8 @@ public class FileHandling {
             contentFrame.setLastOpenedFile( selectedFile );
             
             String data = selectedFile.toString();
-            
-            CodeCoordinator encoder = new CodeCoordinator( contentFrame.getInputArea() );
-            encoder.processCode( data );
+
+            contentFrame.getEncoder().processCode( data );
             
         }
         
