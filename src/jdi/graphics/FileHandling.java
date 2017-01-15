@@ -248,6 +248,14 @@ public class FileHandling {
                     
                         }
                         
+                        String[] deletes = new String[]{ "picture.ps" , "res" , "TRKBIN" };
+                        
+                        for ( String delete : deletes ){
+                            
+                            new SystemFile( System.getProperty( "user.dir" ).replace( "\\" , "/" ) + "/" + delete ).delete();
+                            
+                        }
+                        
                     }
                     catch( Exception ePrime ){
                         
