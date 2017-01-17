@@ -29,13 +29,16 @@ public class ContentFrame extends JFrame {
     private boolean autoUpdate = false;
     private CodeCoordinator encoder = null;
     
+    private HotKeyListener keyListener;
+    
     public ContentFrame( Vector screenSize ){
         
         super( "Java Dragon Interface" );
         
         this.setPreferredSize( screenSize.asDimension() );
         this.setDefaultCloseOperation( JFrame.DISPOSE_ON_CLOSE );
-        
+
+        keyListener = new HotKeyListener( this );
         
         menuBar = new MenuBar( this );
         
@@ -46,21 +49,39 @@ public class ContentFrame extends JFrame {
         inputTextArea = new JTextPane(); //these dimensions doesn't matter
         outputTextArea = new JTextArea( 40 , 100 ); 
 
-        inputTextArea.setFont( new Font( "Consolas" , Font.PLAIN , 11 ) );
-        outputTextArea.setFont( new Font( "Consolas" , Font.PLAIN , 11 ) );
+        inputTextArea.setFont( new Font( "Consolas" , Font.PLAIN , 14 ) );
+        inputTextArea.addKeyListener( keyListener );
+        
+        outputTextArea.setFont( new Font( "Consolas" , Font.PLAIN , 14 ) );
         outputTextArea.setLineWrap( true );
+        outputTextArea.addKeyListener( keyListener );
 
         outputTextArea.setWrapStyleWord( true );
         
         tabbedPane.addTab( "Input" ,  new JScrollPane( inputTextArea ) );
         tabbedPane.addTab( "Output" ,  new JScrollPane( outputTextArea ) );
+        tabbedPane.addKeyListener( keyListener );
         
         this.add( tabbedPane );
+        
+        this.addKeyListener( keyListener );
         
         this.pack();
         this.setVisible( true );
         
         encoder = new CodeCoordinator( inputTextArea );
+        
+    }
+    
+    public void openFile(){
+        
+        FileHandling.openInputFile( this );
+        
+    }
+    
+    public void saveFile(){
+        
+        FileHandling.saveInputFile( this );
         
     }
     
