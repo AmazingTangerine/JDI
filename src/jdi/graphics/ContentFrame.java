@@ -5,6 +5,7 @@ import caprica.datatypes.Vector;
 import caprica.system.Output;
 import java.awt.BorderLayout;
 import java.awt.Font;
+import java.util.HashMap;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -30,6 +31,8 @@ public class ContentFrame extends JFrame {
     private CodeCoordinator encoder = null;
     
     private HotKeyListener keyListener;
+    
+    private DataPanel dataFrame;
     
     public ContentFrame( Vector screenSize ){
         
@@ -58,8 +61,12 @@ public class ContentFrame extends JFrame {
 
         outputTextArea.setWrapStyleWord( true );
         
+        dataFrame = new DataPanel();
+        dataFrame.addKeyListener( keyListener );
+        
         tabbedPane.addTab( "Input" ,  new JScrollPane( inputTextArea ) );
         tabbedPane.addTab( "Output" ,  new JScrollPane( outputTextArea ) );
+        tabbedPane.addTab( "Processed Data" , dataFrame );
         tabbedPane.addKeyListener( keyListener );
         
         this.add( tabbedPane );
@@ -70,6 +77,12 @@ public class ContentFrame extends JFrame {
         this.setVisible( true );
         
         encoder = new CodeCoordinator( inputTextArea );
+
+    }
+    
+    public DataPanel getDataPanel(){
+        
+        return dataFrame;
         
     }
     

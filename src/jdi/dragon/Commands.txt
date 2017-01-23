@@ -1,0 +1,5 @@
+To change density use TISO <Useless> <density>
+
+END: specifies the end of a utility module 
+
+; Is end of record , delimeter for input streams

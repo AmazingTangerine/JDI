@@ -14,6 +14,7 @@ import java.io.File;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import jdi.dragon.CodeCoordinator;
+import jdi.dragon.DataExtraction;
 
 /**
  *
@@ -197,82 +198,99 @@ public class FileHandling {
             String inputData = contentFrame.getEncoder().getActualText();
       
             if ( inputData != null ){
-            
-                SystemFile tempInputFile = new SystemFile( System.getProperty( "user.dir" ) + "/dragon/temp.inp" );
-                SystemFile tempOutputFile = new SystemFile( System.getProperty( "user.dir" ) + "/dragon/temp.txt" );
-   
-                if ( tempOutputFile.exists() ){
-                    
-                    tempOutputFile.delete();
-                    
-                }
-                
-                if ( tempInputFile.exists() ){
-                    
-                    tempInputFile.delete();
-                    
-                }
-                
-                try {
-                
-                    tempInputFile.write( inputData , false );
-             
-                    SystemFile tempBatFile = new SystemFile( System.getProperty( "user.dir" ).replace( "\\" , "/" ) + "/dragon/temp.bat" );
-                    
-                    try {
-     
-                        tempBatFile.write( "@echo off \n dragon\\dragon304s.exe <dragon\\temp.inp> dragon\\temp.txt" , false );
-                        
-                        String dragonCommand = "cmd /C start " + tempBatFile.getFilePath();
-           
-                        Control.exec( dragonCommand , true );
-                        Control.exec( "taskkill /f /im cmd.exe" , true );
-                  
-                        tempInputFile.delete();
-                        tempBatFile.delete();
-    
-                        if ( tempOutputFile.exists() ){
-                    
-                            String outputContent = tempOutputFile.toString();
-                            
-                            contentFrame.getOutputArea().setText( outputContent );
-                            
-                            Control.sleep( 1 );
-                            
-                            boolean deleted = tempOutputFile.delete();
-                    
-                        }
-                        else {
-                    
-                            Popup.errorPopup( contentFrame , "DRAGON could not run file" );
-                    
-                        }
-                        
-                        String[] deletes = new String[]{ "picture.ps" , "res" , "TRKBIN" };
-                        
-                        for ( String delete : deletes ){
-                            
-                            new SystemFile( System.getProperty( "user.dir" ).replace( "\\" , "/" ) + "/" + delete ).delete();
-                            
-                        }
-                        
-                    }
-                    catch( Exception ePrime ){
-                        
-                        Popup.errorPopup( contentFrame , "Could not create batch file" );
-                        
-                        tempBatFile.delete();
-                        
-                    }
 
+                this.contentFrame.getDataPanel().clear();
                 
-                }
-                catch( Exception exception ){
-                
-                    Popup.errorPopup( contentFrame , "Could not write temporary file" );
+                String[] deletes = new String[]{ "picture.ps" , "res" , "TRKBIN" , "picture.pdf" };
+                        
+                for ( String delete : deletes ){
                     
-                    tempInputFile.delete();
+                    new SystemFile( System.getProperty( "user.dir" ).replace( "\\" , "/" ) + "/" + delete ).delete();
+                    new SystemFile( System.getProperty( "user.dir" ).replace( "\\" , "/" ) + "/dragon/" + delete ).delete();
+                                
+                }
                 
+                boolean worked = false;
+                
+                for ( int i = 0 ; i < 3 ; i++ ){
+                
+                    SystemFile tempInputFile = new SystemFile( System.getProperty( "user.dir" ).replace( "\\" , "/" ) + "/dragon/temp.inp" );
+                    SystemFile tempOutputFile = new SystemFile( System.getProperty( "user.dir" ).replace( "\\" , "/" ) + "/dragon/temp.txt" );
+   
+                    if ( tempOutputFile.exists() ){
+                    
+                        tempOutputFile.delete();
+                    
+                    }
+                
+                    if ( tempInputFile.exists() ){
+                    
+                        tempInputFile.delete();
+                    
+                    }
+                
+                    try {
+                
+                        tempInputFile.write( inputData , false );
+             
+                        SystemFile tempBatFile = new SystemFile( System.getProperty( "user.dir" ).replace( "\\" , "/" ) + "/dragon/temp.bat" );
+            
+                        try {
+     
+                            tempBatFile.write( "@echo off \n dragon\\dragon304s.exe <dragon\\temp.inp> dragon\\temp.txt" , false );
+                        
+                            String dragonCommand = "cmd /C start " + tempBatFile.getFilePath();
+           
+                            Control.exec( dragonCommand , true );
+                            Control.exec( "taskkill /f /im cmd.exe" , true );
+                  
+                            tempInputFile.delete();
+                            tempBatFile.delete();
+                   
+                            if ( tempOutputFile.exists() ){
+                    
+                                String outputContent = tempOutputFile.toString();
+                            
+                                contentFrame.getOutputArea().setText( outputContent );
+                            
+                                contentFrame.getDataPanel().displayData( DataExtraction.extractData( outputContent ) );
+                                
+                                Control.sleep( 1.5 );
+                            
+                                boolean deleted = tempOutputFile.delete();
+                                
+                                worked = true;
+                                
+                                break;
+                    
+                            }
+                            
+                        }
+                        catch( Exception ePrime ){
+                        
+                            Popup.errorPopup( contentFrame , "Could not create batch file" );
+                        
+                            tempBatFile.delete();
+                 
+                            break;
+                            
+                        }
+                
+                    }
+                    catch( Exception exception ){
+                
+                        Popup.errorPopup( contentFrame , "Could not write temporary file" );
+                    
+                        tempInputFile.delete();
+                
+                    }
+            
+                }
+
+                if ( !worked ){
+                    
+                    Popup.errorPopup( contentFrame , "DRAGON could not run file" );
+                    
                 }
             
             }
@@ -287,3 +305,4 @@ public class FileHandling {
     }
     
 }
+ 
