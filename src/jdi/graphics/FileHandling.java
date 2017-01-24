@@ -38,13 +38,15 @@ public class FileHandling {
             
             try {
                 
-                tempFile.write( contentFrame.getInputArea().getText() , false );
+                tempFile.write( contentFrame.getEncoder().getActualText() , false );
                 
                 String filePath = contentFrame.getLastOpenedFile().getFilePath();
                 
                 contentFrame.getLastOpenedFile().delete();
                 
                 tempFile.rename( filePath );
+                
+                contentFrame.setLastOpenedFile( tempFile );
                 
             }
             catch( Exception exception ){
@@ -80,10 +82,16 @@ public class FileHandling {
             
             try {
                 
-                selectedFile.write( contentFrame.getInputArea().getText() , false );
+                selectedFile.write( contentFrame.getEncoder().getActualText() , false );
+                
+                contentFrame.setLastOpenedFile( selectedFile );
                 
             }
-            catch( Exception exception ){}
+            catch( Exception exception ){
+            
+                Popup.errorPopup( contentFrame , "Could not save file" );
+            
+            }
             
         }
         

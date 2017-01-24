@@ -20,13 +20,22 @@ GEO: EXCELT: MAC: ASM: FLU: EDI: DELETE: END: PSP: ;
 *----
 * Macroscopic XS
 *----
+
+REAL perc := 1.073 ;
+REAL dens1 dens2 dens3 dens4 ;
+
+EVALUATE dens1 := 0.222222 perc * ; 
+EVALUATE dens2 := 0.833333 perc * ; 
+EVALUATE dens3 := 0.166667 perc * ; 
+EVALUATE dens4 := 1.111111 perc * ; 
+
 MACRO := MAC: ::
 NGRO 2 NMIX 2 NIFI 1
 READ INPUT
-MIX 1 TOTAL 0.222222 0.833333
+MIX 1 TOTAL <<dens1>> <<dens2>>
 SCAT 1 1 0.19222 2 2 0.75333 0.02
 NUSIGF 0.0 0.135 CHI 1.0 0.0
-MIX 2 TOTAL 0.166667 1.111111
+MIX 2 TOTAL <<dens3>> <<dens4>>
 SCAT 2 2 0.00015 0.126667 2 2 1.10111 0.04
 ;
 *----
